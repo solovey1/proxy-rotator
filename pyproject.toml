@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "proxy-rotator"
+version = "0.1.0"
+description = "Unified rotate() for proxy providers: randomize session tokens and/or ports by provider rules"
+authors = ["solovey1"]
+readme = "README.md"
+repository = "https://github.com/solovey1/proxy-rotator"
+packages = [{include = "proxy_rotator"}]
+
+[tool.poetry.urls]
+"Source" = "https://github.com/solovey1/proxy-rotator"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+better-proxy = ">=0.1.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
