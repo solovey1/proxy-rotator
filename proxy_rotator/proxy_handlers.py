@@ -260,6 +260,7 @@ PROXY_HANDLER_REGISTRY: Dict[str, Type[ProxyHandlerBase]] = {
 
     # Proxyseller
     "res.proxy-seller.io": ProxysellerHandler,
+    "res.proxy-seller.com": ProxysellerHandler,
 
     # Infatica
     "pool.infatica.io": InfaticaHandler,
