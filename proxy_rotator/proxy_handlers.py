@@ -212,6 +212,14 @@ class InfaticaHandler(ProxyHandlerBase):
         self.proxy.port = randomize_port(10000, 11000)
         return self.proxy
 
+class ProxyMarketHandler(ProxyHandlerBase):
+    """
+    pool.proxy.market
+    port
+    """
+    def randomize(self) -> Proxy:
+        self.proxy.port = randomize_port(10000, 10999)
+        return self.proxy
 
 # REGISTER HANDLERS (by host)
 PROXY_HANDLER_REGISTRY: Dict[str, Type[ProxyHandlerBase]] = {
@@ -264,6 +272,9 @@ PROXY_HANDLER_REGISTRY: Dict[str, Type[ProxyHandlerBase]] = {
 
     # Infatica
     "pool.infatica.io": InfaticaHandler,
+
+    # proxy market
+    "pool.proxy.market": ProxyMarketHandler,
 }
 
 
