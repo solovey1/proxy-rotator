@@ -265,7 +265,7 @@ PROXY_HANDLER_REGISTRY: Dict[str, Type[ProxyHandlerBase]] = {
 
     # DetectExpert
     "51.79.24.25": DetectExpertHandler,
-
+    "51.77.190.247": DetectExpertHandler,
     # Proxyseller
     "res.proxy-seller.io": ProxysellerHandler,
     "res.proxy-seller.com": ProxysellerHandler,
