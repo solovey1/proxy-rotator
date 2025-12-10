@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "proxy-rotator"
-version = "0.1.0"
+version = "1.0.0"
 description = "Unified rotate() for proxy providers: randomize session tokens and/or ports by provider rules"
 authors = ["solovey1"]
 readme = "README.md"
