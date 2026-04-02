@@ -16,6 +16,7 @@ from __future__ import annotations
 import random
 import re
 import string
+import uuid
 from typing import Dict, Type, Union
 
 from better_proxy import Proxy
@@ -221,6 +222,38 @@ class ProxyMarketHandler(ProxyHandlerBase):
         self.proxy.port = randomize_port(10000, 10999)
         return self.proxy
 
+
+class SXHandler(ProxyHandlerBase):
+    """
+    sx.org (e.g. 89.38.99.242)
+    login: username-UUID (e.g. arkuyvtcwq-a0fcc94e-611d-4b55-ab1b-5cdc453d7b4c)
+    Replace UUID part after first '-'.
+    """
+    def randomize(self) -> Proxy:
+        if self.proxy.login and "-" in self.proxy.login:
+            username, _ = self.proxy.login.split("-", 1)
+            self.proxy.login = f"{username}-{uuid.uuid4()}"
+        return self.proxy
+
+
+class OmegaProxyHandler(LumiProxyHandler):
+    """
+    us.omegaproxy.com / as.omegaproxy.com / eu.omegaproxy.com
+    Session in login: omega-..._session-DYLhofmQu0
+    """
+
+
+class ThordataHandler(ProxyHandlerBase):
+    """
+    thordata.net
+    login: td-customer-...-sessid-ARq82exjkt9wci293-sesstime-60
+    Change 'sessid-' token in login.
+    """
+    def randomize(self) -> Proxy:
+        if self.proxy.login:
+            self.proxy.login = randomize_prefix(self.proxy.login, "sessid-")
+        return self.proxy
+
 # REGISTER HANDLERS (by host)
 PROXY_HANDLER_REGISTRY: Dict[str, Type[ProxyHandlerBase]] = {
     # Lumi
@@ -230,6 +263,7 @@ PROXY_HANDLER_REGISTRY: Dict[str, Type[ProxyHandlerBase]] = {
     "core-residential.evomi.com": EvomiHandler,
 
     # NodeMaven
+    "nodemaven": NodeMavenHandler,
     "gate.nodemaven.com": NodeMavenHandler,
     "gate-ru.nodemaven.com": NodeMavenHandler,
 
@@ -237,6 +271,7 @@ PROXY_HANDLER_REGISTRY: Dict[str, Type[ProxyHandlerBase]] = {
     "gate.nstproxy.io": NSTProxyHandler,
 
     # IProyal
+    "iproyal": IProxyalHandler,
     "geo.iproyal.com": IProxyalHandler,
 
     # NetNut
@@ -244,10 +279,12 @@ PROXY_HANDLER_REGISTRY: Dict[str, Type[ProxyHandlerBase]] = {
     "gw.netnut.net": NetnutHandler,
 
     # DataImpulse
+    "dataimpulse"
     "gw.dataimpulse.com": DataImpulseHandler,
     "w.dataimpulse.com": DataImpulseHandler,
 
     # ProxyWing
+    "proxywing": ProxyWingHandler,
     "premium.proxywing.com": ProxyWingHandler,
     "quality.proxywing.com": ProxyWingHandler,
 
@@ -258,15 +295,19 @@ PROXY_HANDLER_REGISTRY: Dict[str, Type[ProxyHandlerBase]] = {
     "proxy.soax.com": SoaxHandler,
 
     # Geonix
+    "geonix": GeonixHandler,
     "res.geonix.com": GeonixHandler,
 
     # ProxyShard
+    "proxyshard": ProxyShardHandler,
     "resident.proxyshard.com": ProxyShardHandler,
 
     # DetectExpert
     "51.79.24.25": DetectExpertHandler,
     "51.77.190.247": DetectExpertHandler,
+
     # Proxyseller
+    "proxy-seller": ProxysellerHandler,
     "res.proxy-seller.io": ProxysellerHandler,
     "res.proxy-seller.com": ProxysellerHandler,
 
@@ -275,6 +316,15 @@ PROXY_HANDLER_REGISTRY: Dict[str, Type[ProxyHandlerBase]] = {
 
     # proxy market
     "pool.proxy.market": ProxyMarketHandler,
+
+    # SX
+    "89.38.99.242": SXHandler,
+
+    # OmegaProxy
+    "omegaproxy": OmegaProxyHandler,
+
+    # Thordata
+    "thordata": ThordataHandler,
 }
 
 
@@ -317,8 +367,14 @@ def get_proxy_handler(
             return handler(proxy)
         raise TypeError("handler must be a handler instance or a ProxyHandlerBase subclass")
 
-    # 2) By host
-    handler_cls = PROXY_HANDLER_REGISTRY.get(proxy.host.lower(), ProxyHandlerBase)
+    # 2) By host — exact match first, then substring match
+    host = proxy.host.lower()
+    handler_cls = PROXY_HANDLER_REGISTRY.get(host)
+    if handler_cls is None:
+        handler_cls = next(
+            (cls for key, cls in PROXY_HANDLER_REGISTRY.items() if key in host),
+            ProxyHandlerBase,
+        )
     return handler_cls(proxy)
 
 
