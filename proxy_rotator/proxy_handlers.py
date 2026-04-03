@@ -254,6 +254,16 @@ class ThordataHandler(ProxyHandlerBase):
             self.proxy.login = randomize_prefix(self.proxy.login, "sessid-")
         return self.proxy
 
+
+class DecodoHandler(ProxyHandlerBase):
+    """
+    gate.decodo.com
+    Randomize port in range 10001-49999.
+    """
+    def randomize(self) -> Proxy:
+        self.proxy.port = randomize_port(10001, 49999)
+        return self.proxy
+
 # REGISTER HANDLERS (by host)
 PROXY_HANDLER_REGISTRY: Dict[str, Type[ProxyHandlerBase]] = {
     # Lumi
@@ -325,6 +335,10 @@ PROXY_HANDLER_REGISTRY: Dict[str, Type[ProxyHandlerBase]] = {
 
     # Thordata
     "thordata": ThordataHandler,
+
+    # Decodo
+    "decodo": DecodoHandler,
+    "gate.decodo.com": DecodoHandler,
 }
 
 
