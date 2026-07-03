@@ -327,6 +327,7 @@ PROXY_HANDLER_REGISTRY: Dict[str, Type[ProxyHandlerBase]] = {
     # Geonix
     "geonix": GeonixHandler,
     "res.geonix.com": GeonixHandler,
+    "95.135.93.128": GeonixHandler,
 
     # ProxyShard
     "proxyshard": ProxyShardHandler,
