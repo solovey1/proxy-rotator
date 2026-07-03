@@ -255,6 +255,26 @@ class ThordataHandler(ProxyHandlerBase):
         return self.proxy
 
 
+class GenericSessionHandler(ProxyHandlerBase):
+    """
+    Fallback for unknown providers: look for a known session-token prefix
+    in login, then password, and randomize the first match.
+    Longest prefixes first so 'sessionid-'/'sessid-' win over 'sid-'.
+    """
+    PREFIXES = ("sessionid-", "sessid-", "session-", "sid-")
+
+    def randomize(self) -> Proxy:
+        for field in ("login", "password"):
+            value = getattr(self.proxy, field, None)
+            if not value:
+                continue
+            for prefix in self.PREFIXES:
+                if re.search(rf"{re.escape(prefix)}[A-Za-z0-9]+", value):
+                    setattr(self.proxy, field, randomize_prefix(value, prefix))
+                    return self.proxy
+        return self.proxy
+
+
 class DecodoHandler(ProxyHandlerBase):
     """
     gate.decodo.com
@@ -367,7 +387,7 @@ def get_proxy_handler(
     Priority:
       1) Explicit handler (instance or class)
       2) Host-based registry
-      3) Default ProxyHandlerBase
+      3) GenericSessionHandler (tries common session prefixes, else no-op)
     """
     if isinstance(proxy, str):
         proxy = Proxy.from_str(proxy)
@@ -387,7 +407,7 @@ def get_proxy_handler(
     if handler_cls is None:
         handler_cls = next(
             (cls for key, cls in PROXY_HANDLER_REGISTRY.items() if key in host),
-            ProxyHandlerBase,
+            GenericSessionHandler,
         )
     return handler_cls(proxy)
 
