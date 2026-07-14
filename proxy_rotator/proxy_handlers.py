@@ -143,11 +143,18 @@ class DataImpulseHandler(ProxyHandlerBase):
         return self.proxy
 
 
-class ProxyWingHandler(EvomiHandler):
+class ProxyWingHandler(ProxyHandlerBase):
     """
     premium.proxywing.com / quality.proxywing.com
     Session in password: ...-session-iad74rBS
+    Or in login: pkg-...-session-88mqhsctfkbv
     """
+    def randomize(self) -> Proxy:
+        if self.proxy.login and "session-" in self.proxy.login:
+            self.proxy.login = randomize_prefix(self.proxy.login, "session-")
+        elif self.proxy.password:
+            self.proxy.password = randomize_prefix(self.proxy.password, "session-")
+        return self.proxy
 
 
 class GeoNodeHandler(LumiProxyHandler):
@@ -440,3 +447,5 @@ def rotate(
     handler_instance = get_proxy_handler(proxy, handler=handler)
     new_proxy = handler_instance.randomize()
     return str(new_proxy)
+
+print(rotate("http://pkg-private2-pool-onlyipv4-country-co-session-88mqhsctfkbv:8ea9wqjhg1aqnaef@quality.proxywing.com:8888"))
