@@ -447,5 +447,3 @@ def rotate(
     handler_instance = get_proxy_handler(proxy, handler=handler)
     new_proxy = handler_instance.randomize()
     return str(new_proxy)
-
-print(rotate("http://pkg-private2-pool-onlyipv4-country-co-session-88mqhsctfkbv:8ea9wqjhg1aqnaef@quality.proxywing.com:8888"))
